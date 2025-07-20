@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tic Tac Toe</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f4f4f4;
+    }
+
+    h1 {
+      margin-top: 30px;
+      color: #333;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-gap: 10px;
+      justify-content: center;
+      margin-top: 40px;
+    }
+
+    .cell {
+      width: 100px;
+      height: 100px;
+      background-color: #fff;
+      font-size: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: 2px solid #333;
+      transition: background-color 0.3s;
+    }
+
+    .cell.X {
+      color: red;
+    }
+
+    .cell.O {
+      color: blue;
+    }
+
+    #winnerText {
+      margin-top: 20px;
+      font-size: 1.2rem;
+      color: #444;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Tic Tac Toe</h1>
+
+  <!-- 🎮 Game Board -->
+  <div class="board" id="board">
+    <div class="cell" data-cell></div>
+    <div class="cell" data-cell></div>
+    <div class="cell" data-cell></div>
+    <div class="cell" data-cell></div>
+    <div class="cell" data-cell></div>
+    <div class="cell" data-cell></div>
+    <div class="cell" data-cell></div>
+    <div class="cell" data-cell></div>
+    <div class="cell" data-cell></div>
+  </div>
+
+  <!-- 🏆 Winner Text -->
+  <h2 id="winnerText"></h2>
+
+  <!-- 🔁 Restart Button -->
+  <button id="restartBtn">Restart</button>
+
+  <!-- 🔊 Sound Effects -->
+  <audio id="clickSound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+  <audio id="winSound" src="https://www.soundjay.com/misc/sounds/bell-ringing-01.mp3"></audio>
+
+  <!-- 💻 Game Logic -->
+  <script>
+    const cells = document.querySelectorAll('[data-cell]');
+    const winnerText = document.getElementById('winnerText');
+    const restartBtn = document.getElementById('restartBtn');
+    const clickSound = document.getElementById('clickSound');
+    const winSound = document.getElementById('winSound');
+
+    let currentPlayer = 'X';
+    let gameactive = true;
+
+    const winningConditions = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
+      [0, 3, 6], [1, 4, 7], [2, 5, 8], // cols
+      [0, 4, 8], [2, 4, 6]             // diagonals
+    ];
+
+    // 💥 Handle Click
+    function handleCellClick(event) {
+      const cell = event.target;
+      if (cell.classList.contains('X') || cell.classList.contains('O') || !gameactive) return;
+
+      cell.classList.add(currentPlayer);
+      cell.textContent = currentPlayer;
+      clickSound.play();
+
+      if (checkWinner()) {
+        winSound.play();
+        winnerText.textContent = `🎉 Player ${currentPlayer} Wins!`;
+        gameactive = false;
+        return;
+      }
+
+      if (isDraw()) {
+        winnerText.textContent = '😐 It\'s a Draw!';
+        gameactive = false;
+        return;
+      }
+
+      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+    }
+
+    // 🧠 Check Winner
+    function checkWinner() {
+      for (let i = 0; i < winningConditions.length; i++) {
+        const [a, b, c] = winningConditions[i];
+        const cell1 = cells[a];
+        const cell2 = cells[b];
+        const cell3 = cells[c];
+
+        if (
+          cell1.classList.contains(currentPlayer) &&
+          cell2.classList.contains(currentPlayer) &&
+          cell3.classList.contains(currentPlayer)
+        ) {
+          // ✅ Highlight winning cells
+          cell1.style.backgroundColor = "#90ee90";
+          cell2.style.backgroundColor = "#90ee90";
+          cell3.style.backgroundColor = "#90ee90";
+          return true;
+        }
+      }
+      return false;
+    }
+
+    // 🤝 Check Draw
+    function isDraw() {
+      return [...cells].every(cell =>
+        cell.classList.contains('X') || cell.classList.contains('O')
+      );
+    }
+
+    // 🔄 Restart Game
+    function restartGame() {
+      cells.forEach(cell => {
+        cell.classList.remove('X', 'O');
+        cell.textContent = '';
+        cell.style.backgroundColor = '#fff';
+      });
+      currentPlayer = 'X';
+      gameactive = true;
+      winnerText.textContent = '';
+    }
+
+    // 🖱️ Add Listeners
+    cells.forEach(cell => {
+      cell.addEventListener('click', handleCellClick);
+    });
+
+    restartBtn.addEventListener('click', restartGame);
+  </script>
+</body>
+</html>
