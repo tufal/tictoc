@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -63,35 +62,62 @@
       cursor: pointer;
       margin: 5px;
     }
+
+    #startScreen input {
+      padding: 10px;
+      margin: 10px;
+      font-size: 1rem;
+    }
   </style>
 </head>
 <body>
   <h1>Tic Tac Toe</h1>
-  <div class="scoreboard">
-    🧑‍💻 Tufel (X): <span id="scoreX">0</span> |
-    🧑‍🔧 Faizan (O): <span id="scoreO">0</span> |
-    🔄 Rounds Played: <span id="roundCount">0</span>
+
+  <!-- Start Screen -->
+  <div id="startScreen">
+    <h2>Welcome to Tic Tac Toe</h2>
+    <input type="text" id="player1" placeholder="Enter Player 1 Name" />
+    <input type="text" id="player2" placeholder="Enter Player 2 Name" />
+    <br>
+    <label>
+      <input type="radio" name="symbol" value="X" checked> Player 2 is X
+    </label>
+    <label>
+      <input type="radio" name="symbol" value="O"> Player 2 is O
+    </label>
+    <br><br>
+    <button onclick="startGame()">Start Game</button>
   </div>
 
-  <div class="board" id="board">
-    <div class="cell" data-cell></div>
-    <div class="cell" data-cell></div>
-    <div class="cell" data-cell></div>
-    <div class="cell" data-cell></div>
-    <div class="cell" data-cell></div>
-    <div class="cell" data-cell></div>
-    <div class="cell" data-cell></div>
-    <div class="cell" data-cell></div>
-    <div class="cell" data-cell></div>
+  <!-- Game Area -->
+  <div id="gameArea" style="display:none;">
+    <div class="scoreboard">
+      🧑‍💻 <span id="playerXLabel">Player X</span> (X): <span id="scoreX">0</span> |
+      🧑‍🔧 <span id="playerOLabel">Player O</span> (O): <span id="scoreO">0</span> |
+      🔄 Rounds Played: <span id="roundCount">0</span>
+    </div>
+
+    <div class="board" id="board">
+      <div class="cell" data-cell></div>
+      <div class="cell" data-cell></div>
+      <div class="cell" data-cell></div>
+      <div class="cell" data-cell></div>
+      <div class="cell" data-cell></div>
+      <div class="cell" data-cell></div>
+      <div class="cell" data-cell></div>
+      <div class="cell" data-cell></div>
+      <div class="cell" data-cell></div>
+    </div>
+
+    <h2 id="winnerText"></h2>
+
+    <div class="btns">
+      <button id="restartBtn">Restart Round</button>
+      <button id="resetGameBtn">Reset Game</button>
+    </div>
   </div>
 
-  <h2 id="winnerText"></h2>
-
-  <div class="btns">
-    <button id="restartBtn">Restart Round</button>
-    <button id="resetGameBtn">Reset Game</button>
-  </div>
-
+  <!-- Sounds -->
   <audio id="clickSound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
   <audio id="winSound" src="https://www.soundjay.com/misc/sounds/bell-ringing-01.mp3"></audio>
 
@@ -102,21 +128,59 @@
     const resetGameBtn = document.getElementById('resetGameBtn');
     const clickSound = document.getElementById('clickSound');
     const winSound = document.getElementById('winSound');
-    const scoreXText = document.getElementById('scoreX');
-    const scoreOText = document.getElementById('scoreO');
-    const roundCountText = document.getElementById('roundCount');
+    let scoreXText = document.getElementById('scoreX');
+    let scoreOText = document.getElementById('scoreO');
+    let roundCountText = document.getElementById('roundCount');
+    const startScreen = document.getElementById("startScreen");
+    const gameArea = document.getElementById("gameArea");
+    const playerXLabel = document.getElementById("playerXLabel");
+    const playerOLabel = document.getElementById("playerOLabel");
 
     let currentPlayer = 'X';
     let gameactive = true;
     let scoreX = 0;
     let scoreO = 0;
     let roundCount = 0;
+    let playerX = 'Player X';
+    let playerO = 'Player O';
 
     const winningConditions = [
       [0, 1, 2], [3, 4, 5], [6, 7, 8],
       [0, 3, 6], [1, 4, 7], [2, 5, 8],
       [0, 4, 8], [2, 4, 6]
     ];
+
+    function startGame() {
+      const p1 = document.getElementById("player1").value.trim();
+      const p2 = document.getElementById("player2").value.trim();
+      const selectedSymbol = document.querySelector('input[name="symbol"]:checked').value;
+
+      if (!p1 || !p2) {
+        alert("Please enter both player names.");
+        return;
+      }
+
+      if (p1 === p2) {
+        alert("Names must be different.");
+        return;
+      }
+
+      if (selectedSymbol === 'X') {
+        playerX = p2;
+        playerO = p1;
+      } else {
+        playerX = p1;
+        playerO = p2;
+      }
+
+      playerXLabel.textContent = playerX;
+      playerOLabel.textContent = playerO;
+
+      startScreen.style.display = "none";
+      gameArea.style.display = "block";
+
+      resetGame();
+    }
 
     function handleCellClick(event) {
       const cell = event.target;
@@ -128,14 +192,12 @@
 
       if (checkWinner()) {
         winSound.play();
-        winnerText.textContent = `🎉 ${currentPlayer === 'X' ? 'Tufel' : 'Faizan'} wins this round!`;
+        winnerText.textContent = `🎉 ${currentPlayer === 'X' ? playerX : playerO} wins this round!`;
         gameactive = false;
 
         currentPlayer === 'X' ? scoreX++ : scoreO++;
         roundCount++;
-
         updateScoreboard();
-
         checkGameWinner();
         return;
       }
@@ -176,11 +238,11 @@
 
     function checkGameWinner() {
       if (scoreX === 3) {
-        winnerText.textContent = "🏆 Tufel wins the game!";
+        winnerText.textContent = `🏆 ${playerX} wins the game!`;
         gameactive = false;
         disableBoard();
       } else if (scoreO === 3) {
-        winnerText.textContent = "🏆 Faizan wins the game!";
+        winnerText.textContent = `🏆 ${playerO} wins the game!`;
         gameactive = false;
         disableBoard();
       }
