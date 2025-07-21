@@ -25,7 +25,7 @@
     .board {
       display: grid;
       grid-template-columns: repeat(3, 100px);
-      grid-gap: 10px;
+      gap: 10px;
       justify-content: center;
       margin-top: 30px;
     }
@@ -69,6 +69,17 @@
       font-size: 1rem;
     }
   </style>
+
+  <!-- Google Analytics (replace ID below with real one) -->
+  <!-- 
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
+  -->
 </head>
 <body>
   <h1>Tic Tac Toe</h1>
@@ -79,12 +90,8 @@
     <input type="text" id="player1" placeholder="Enter Player 1 Name" />
     <input type="text" id="player2" placeholder="Enter Player 2 Name" />
     <br>
-    <label>
-      <input type="radio" name="symbol" value="X" checked> Player 2 is X
-    </label>
-    <label>
-      <input type="radio" name="symbol" value="O"> Player 2 is O
-    </label>
+    <label><input type="radio" name="symbol" value="X" checked> Player 2 is X</label>
+    <label><input type="radio" name="symbol" value="O"> Player 2 is O</label>
     <br><br>
     <button onclick="startGame()">Start Game</button>
   </div>
@@ -98,15 +105,16 @@
     </div>
 
     <div class="board" id="board">
-      <div class="cell" data-cell></div>
-      <div class="cell" data-cell></div>
-      <div class="cell" data-cell></div>
-      <div class="cell" data-cell></div>
-      <div class="cell" data-cell></div>
-      <div class="cell" data-cell></div>
-      <div class="cell" data-cell></div>
-      <div class="cell" data-cell></div>
-      <div class="cell" data-cell></div>
+      <!-- 9 cells -->
+      <div class="cell" data-cell tabindex="0" aria-label="Cell 1"></div>
+      <div class="cell" data-cell tabindex="0" aria-label="Cell 2"></div>
+      <div class="cell" data-cell tabindex="0" aria-label="Cell 3"></div>
+      <div class="cell" data-cell tabindex="0" aria-label="Cell 4"></div>
+      <div class="cell" data-cell tabindex="0" aria-label="Cell 5"></div>
+      <div class="cell" data-cell tabindex="0" aria-label="Cell 6"></div>
+      <div class="cell" data-cell tabindex="0" aria-label="Cell 7"></div>
+      <div class="cell" data-cell tabindex="0" aria-label="Cell 8"></div>
+      <div class="cell" data-cell tabindex="0" aria-label="Cell 9"></div>
     </div>
 
     <h2 id="winnerText"></h2>
@@ -128,9 +136,9 @@
     const resetGameBtn = document.getElementById('resetGameBtn');
     const clickSound = document.getElementById('clickSound');
     const winSound = document.getElementById('winSound');
-    let scoreXText = document.getElementById('scoreX');
-    let scoreOText = document.getElementById('scoreO');
-    let roundCountText = document.getElementById('roundCount');
+    const scoreXText = document.getElementById('scoreX');
+    const scoreOText = document.getElementById('scoreO');
+    const roundCountText = document.getElementById('roundCount');
     const startScreen = document.getElementById("startScreen");
     const gameArea = document.getElementById("gameArea");
     const playerXLabel = document.getElementById("playerXLabel");
@@ -214,14 +222,11 @@
     }
 
     function checkWinner() {
-      return winningConditions.some(condition => {
-        const [a, b, c] = condition;
-        return (
-          cells[a].classList.contains(currentPlayer) &&
-          cells[b].classList.contains(currentPlayer) &&
-          cells[c].classList.contains(currentPlayer)
-        );
-      });
+      return winningConditions.some(([a, b, c]) =>
+        cells[a].classList.contains(currentPlayer) &&
+        cells[b].classList.contains(currentPlayer) &&
+        cells[c].classList.contains(currentPlayer)
+      );
     }
 
     function isDraw() {
